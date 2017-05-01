@@ -177,7 +177,7 @@ if myHero.charName ~="Xerath" then return end
 		local ePred = GetPred(target,E.speed,0.35 + Game.Latency()/1000)
 		if myHero.pos:DistanceTo(ePred) < E.range and IsReady(_E) then
 			if not ePred:ToScreen().onScreen then
-						pos = myHero.pos + Vector(myHero.pos,qPred):Normalized() * math.random(530,760)
+						pos = myHero.pos + Vector(myHero.pos,ePred):Normalized() * math.random(530,760)
 						AimbotCast(HK_E, pos, 100)	
 					else
 						AimbotCast(HK_E, ePred, 100)
