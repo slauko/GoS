@@ -119,7 +119,7 @@ if myHero.charName ~="Xerath" then return end
 			self.Menu:MenuElement({type = MENU, name = "Combo Settings", id = "Combo"})
 			self.Menu.Combo:MenuElement({name = "Use Q", id = "Q", value = true})
 			self.Menu.Combo:MenuElement({name = "Use W", id = "W", value = true})
-			self.Menu.Combo:MenuElement({name = "Use E", id = "E", value = true})
+			self.Menu.Combo:MenuElement({name = "Use E Aimbot", id = "E", key = string.byte("G")})
 			self.Menu.Combo:MenuElement({name = "Use R Aimbot", id = "R", key = string.byte("T")})
 
 			self.Menu:MenuElement({type = MENU, name = "Draw Settings", id = "Draw"})
@@ -145,14 +145,16 @@ if myHero.charName ~="Xerath" then return end
 		   if rBuff.count > 0 then
 				self:RCast(target)
 		   end
+		   if self.Menu.Combo.E:Value() then
+		   		self:ECast(target)
+		   end
 		end
 	end
 --COMBO
 	function Xerath:Combo(target)
 	if target==nil then return end
 	local qPred = GetPred(target,math.huge,0.35 + Game.Latency()/1000)
-	local wPred = GetPred(target,math.huge,0.35 + Game.Latency()/1000)
-		
+	local wPred = GetPred(target,math.huge,0.35 + Game.Latency()/1000)	
 		if myHero.pos:DistanceTo(qPred) < Q.range and self.Menu.Combo.Q:Value() and IsReady(_Q) then
 			Control.KeyDown(HK_Q)
 				if myHero.pos:DistanceTo(qPred) < Q2.range-200 then
@@ -169,7 +171,19 @@ if myHero.charName ~="Xerath" then return end
 			Control.CastSpell(HK_W,wPred)
 		end
 	end
-
+	
+	function Xerath:ECast(target)
+		local ePred = GetPred(target,E.speed,0.35 + Game.Latency()/1000)
+		if myHero.pos:DistanceTo(ePred) < E.range and IsReady(_E) then
+			if not qPred:ToScreen().onScreen then
+						pos = myHero.pos + Vector(myHero.pos,qPred):Normalized() * math.random(530,760)
+						AimbotCast(HK_E, pos, 100)	
+					else
+						AimbotCast(HK_E, ePred, 100)
+					end
+		end
+	end
+	
 	function Xerath:RCast(target)
 		if target==nil then return end
 		if self.Menu.Combo.R:Value() then
