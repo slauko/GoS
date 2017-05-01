@@ -173,6 +173,7 @@ if myHero.charName ~="Xerath" then return end
 	end
 	
 	function Xerath:ECast(target)
+	if target==nil then return end
 		local ePred = GetPred(target,E.speed,0.35 + Game.Latency()/1000)
 		if myHero.pos:DistanceTo(ePred) < E.range and IsReady(_E) then
 			if not qPred:ToScreen().onScreen then
