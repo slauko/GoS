@@ -84,12 +84,12 @@ if myHero.charName ~="Xerath" then return end
 		if OnWaypoint(unit).speed > unitSpeed then unitSpeed = OnWaypoint(unit).speed end
 		if OnVision(unit).state == false then
 			local unitPos = unit.pos + Vector(unit.pos,unit.posTo):Normalized() * ((GetTickCount() - OnVision(unit).tick)/1000 * unitSpeed)
-			local predPos = unitPos + (Vector(unit.pos,unit.posTo):Normalized() * (unitSpeed * (delay + (GetDistance(myHero.pos,unitPos)/speed))))/2 --small adjustment /2
+			local predPos = unitPos + (Vector(unit.pos,unit.posTo):Normalized() * (unitSpeed * (delay + (GetDistance(myHero.pos,unitPos)/speed))))/2 --here
 			if GetDistance(unit.pos,predPos) > GetDistance(unit.pos,unit.posTo) then predPos = unit.posTo end
 				return predPos
 			else
 			if unitSpeed > unit.ms then
-				local predPos = unit.pos + Vector(OnWaypoint(unit).startPos,unit.posTo):Normalized() * ((unitSpeed * (delay + (GetDistance(myHero.pos,unit.pos)/speed))))/2 --same here
+				local predPos = unit.pos + (Vector(OnWaypoint(unit).startPos,unit.posTo):Normalized() * (unitSpeed * (delay + (GetDistance(myHero.pos,unit.pos)/speed))))/2 --here
 				if GetDistance(unit.pos,predPos) > GetDistance(unit.pos,unit.posTo) then predPos = unit.posTo end
 					return predPos
 			elseif IsImmobileTarget(unit) then
@@ -135,29 +135,27 @@ if myHero.charName ~="Xerath" then return end
     --PrintChat("" ,rBuff.count)
 		self:castingQ()
 		if not myHero.dead  then
-       	local target = _G.SDK.TargetSelector.SelectedTarget
-		   if target~=nil and target.dead then
-		   		target=nil
-		   end
 		   if _G.SDK.Orbwalker.Modes[_G.SDK.ORBWALKER_MODE_COMBO] then   
-        		self:Combo(target)
+        		self:Combo()
 	       end        
 		   if rBuff.count > 0 then
-				self:RCast(target)
+				self:RCast()
 		   end
 		   if self.Menu.Combo.E:Value() then
-		   		self:ECast(target)
+		   		self:ECast()
 		   end
 		end
 	end
 --COMBO
-	function Xerath:Combo(target)
+	function Xerath:Combo()
+	local target = _G.SDK.TargetSelector.SelectedTarget
 	if target==nil then return end
+	if target~=nil and target.dead then return end
 	local qPred = GetPred(target,math.huge,0.35 + Game.Latency()/1000)
 	local wPred = GetPred(target,math.huge,0.35 + Game.Latency()/1000)	
 		if myHero.pos:DistanceTo(qPred) < Q.range and self.Menu.Combo.Q:Value() and IsReady(_Q) then
 			Control.KeyDown(HK_Q)
-				if myHero.pos:DistanceTo(qPred) < Q2.range-200 then
+				if myHero.pos:DistanceTo(qPred) < Q2.range-100 then
 					if not qPred:ToScreen().onScreen then
 						pos = myHero.pos + Vector(myHero.pos,qPred):Normalized() * math.random(530,760)
 						Control.SetCursorPos(pos)
@@ -172,9 +170,11 @@ if myHero.charName ~="Xerath" then return end
 		end
 	end
 	
-	function Xerath:ECast(target)
+	function Xerath:ECast()
+	local target = _G.SDK.TargetSelector.SelectedTarget
 	if target==nil then return end
-		local ePred = GetPred(target,E.speed,0.35 + Game.Latency()/1000)
+	if target~=nil and target.dead then return end
+	local ePred = GetPred(target,E.speed,0.35 + Game.Latency()/1000)
 		if myHero.pos:DistanceTo(ePred) < E.range and IsReady(_E) then
 			if not ePred:ToScreen().onScreen then
 						pos = myHero.pos + Vector(myHero.pos,ePred):Normalized() * math.random(530,760)
@@ -185,9 +185,11 @@ if myHero.charName ~="Xerath" then return end
 		end
 	end
 	
-	function Xerath:RCast(target)
-		if target==nil then return end
-		if self.Menu.Combo.R:Value() then
+	function Xerath:RCast()
+	local target = _G.SDK.TargetSelector.SelectedTarget
+	if target==nil then return end
+	if target~=nil and target.dead then return end
+	if self.Menu.Combo.R:Value() and mousePos:DistanceTo(target.pos)<=500 then
 				if target then
 					local rPred = GetPred(target,math.huge,0.45)
 					if rPred:ToScreen().onScreen then
