@@ -106,9 +106,8 @@ if myHero.charName ~="Xerath" then return end
 		E ={range =	myHero:GetSpellData(_E).range, delay = myHero:GetSpellData(_E).delay, speed = myHero:GetSpellData(_E).speed}
 		R ={range =	2000 + 1220*myHero:GetSpellData(_R).level, delay = myHero:GetSpellData(_R).delay, speed = myHero:GetSpellData(_R).speed}
 		Q2={range = myHero:GetSpellData(_Q).range}
-		self.chargeQ = false
-		self.qTick = GetTickCount()
-		
+		self.qTick = GetTickCount()	
+		self.chargeQ = false	
 		self:Menu()
 		Callback.Add("Tick", function() self:Tick() end)
 		Callback.Add("Draw", function() self:Draw() end)
@@ -132,8 +131,8 @@ if myHero.charName ~="Xerath" then return end
 --TICK
 	function Xerath:Tick()
 	rBuff = GetBuffData(myHero,"XerathLocusOfPower2")
-    --PrintChat("" ,rBuff.count)
-		self:castingQ()
+	qBuff = GetBuffData(myHero,"XerathArcanopulseChargeUp")
+    --PrintChat("" ,qBuff.count)
 		if not myHero.dead  then
 		   if _G.SDK.Orbwalker.Modes[_G.SDK.ORBWALKER_MODE_COMBO] then   
         		self:Combo()
@@ -145,10 +144,11 @@ if myHero.charName ~="Xerath" then return end
 		   		self:ECast()
 		   end
 		end
+		self:castingQ(qBuff)
 	end
 --COMBO
 	function Xerath:Combo()
-	local target = _G.SDK.TargetSelector.SelectedTarget
+	local target = _G.SDK.TargetSelector:GetTarget(Q.range)
 	if target==nil then return end
 	if target~=nil and target.dead then return end
 	local qPred = GetPred(target,math.huge,0.35 + Game.Latency()/1000)
@@ -158,20 +158,20 @@ if myHero.charName ~="Xerath" then return end
 				if myHero.pos:DistanceTo(qPred) < Q2.range-100 then
 					if not qPred:ToScreen().onScreen then
 						pos = myHero.pos + Vector(myHero.pos,qPred):Normalized() * math.random(530,760)
-						Control.SetCursorPos(pos)
-						Control.KeyUp(HK_Q)	
+						Control.CastSpell(HK_Q, pos)
 					else
-						Control.CastSpell(HK_Q,qPred)
+						Control.CastSpell(HK_Q, qPred)
 					end
 				end
 		end
-		if myHero.pos:DistanceTo(wPred) < W.range and self.Menu.Combo.W:Value() and IsReady(_W) then
+		if myHero.pos:DistanceTo(wPred) < W.range and self.Menu.Combo.W:Value() and IsReady(_W) and self.chargeQ == false and IsImmobileTarget(target) then
 			Control.CastSpell(HK_W,wPred)
+			DelayAction(function()end,0.03)
 		end
 	end
 	
 	function Xerath:ECast()
-	local target = _G.SDK.TargetSelector.SelectedTarget
+	local target = _G.SDK.TargetSelector:GetTarget(E.range)
 	if target==nil then return end
 	if target~=nil and target.dead then return end
 	local ePred = GetPred(target,E.speed,0.35 + Game.Latency()/1000)
@@ -189,41 +189,46 @@ if myHero.charName ~="Xerath" then return end
 	local target = _G.SDK.TargetSelector.SelectedTarget
 	if target==nil then return end
 	if target~=nil and target.dead then return end
-	if self.Menu.Combo.R:Value() and mousePos:DistanceTo(target.pos)<=500 then
-				if target then
-					local rPred = GetPred(target,math.huge,0.45)
-					if rPred:ToScreen().onScreen then
-						AimbotCast(HK_R, rPred, 100)
-					end
-				end
+		if self.Menu.Combo.R:Value() then
+			local rPred = GetPred(target,math.huge,0.45)
+			if rPred:ToScreen().onScreen then
+				AimbotCast(HK_R, rPred, 100)
+			end
 		end
 	end
 -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-	function Xerath:castingQ()		--Noddy <3
-		if self.chargeQ == true then
-			Q2.range = 750 + 500*(GetTickCount()-self.qTick)/1000
-			if Q2.range > 1500 then Q2.range = 1500 end
-		end
-		local qBuff = GetBuffData(myHero,"XerathArcanopulseChargeUp")
-		if self.chargeQ == false and qBuff.count > 0 then
-			self.qTick = GetTickCount()
-			self.chargeQ = true
-		end
-		if self.chargeQ == true and qBuff.count == 0 then
-			self.chargeQ = false
-			Q2.range = 750
-			if Control.IsKeyDown(HK_Q) == true then
-				Control.KeyUp(HK_Q)
-			end
-		end
-		if Control.IsKeyDown(HK_Q) == true and self.chargeQ == false then
-			DelayAction(function()
-				if Control.IsKeyDown(HK_Q) == true and self.chargeQ == false then
-					Control.KeyUp(HK_Q)
-				end
-			end,0.3)
+	function Xerath:castingQ(qBuff) --Noddy
+	if self.chargeQ == true then
+		Q2.range = 750 + 500*(GetTickCount()-self.qTick)/1000
+		if Q2.range > 1500 then Q2.range = 1500 end
+	end
+	if self.chargeQ == false and qBuff.count > 0 then
+		self.qTick = GetTickCount()
+		self.chargeQ = true
+	end
+	if self.chargeQ == true and qBuff.count == 0 then
+		self.chargeQ = false
+		Q2.range = 750
+		if Control.IsKeyDown(HK_Q) == true then
+			Control.KeyUp(HK_Q)
 		end
 	end
+	if Control.IsKeyDown(HK_Q) == true and self.chargeQ == false then
+		DelayAction(function()
+			if Control.IsKeyDown(HK_Q) == true and self.chargeQ == false then
+				Control.KeyUp(HK_Q)
+			end
+		end,0.3)
+	end
+	if Control.IsKeyDown(HK_Q) == true and Game.CanUseSpell(_Q) ~= 0 then
+		DelayAction(function()
+			if Control.IsKeyDown(HK_Q) == true then
+				Q2.range = 750
+				Control.KeyUp(HK_Q)
+			end
+		end,0.01)
+	end
+end
 
 	local isCasting = 0 
 	function AimbotCast(spell, pos, delay) --Weedle with some adds
@@ -261,7 +266,7 @@ if myHero.charName ~="Xerath" then return end
 			Draw.Circle(myHero.pos, E.range, Draw.Color(255,255,255,255))
 		end
 		if self.Menu.Draw.R:Value() and self.Menu.Combo.R:Value() then
-			Draw.Circle(mousePos, 500, 1.5, Draw.Color(255,255,0,0))
+			Draw.Text("R on marked Target", 20, mousePos:To2D().x - 80, mousePos:To2D().y + 40, Draw.Color(255, 255, 000, 000))
 		end
 	end
 
