@@ -770,15 +770,12 @@ function LazyVarus:castingQ()
 end
 
 function LazyVarus:Combo()
-	if self.chargeR == false then
 		if LazyMenu.Combo.useE:Value() then
 			self:useE()
 		end
 		if LazyMenu.Combo.useQ:Value() then
 			self:useQ()
 		end
-	end
-	self:useR()
 end
 
 function LazyVarus:Harass()
@@ -824,34 +821,6 @@ function LazyVarus:useE()
 				self:useECC(target)
 				self:useEkill(target,ePred)
 				self:useEbrainAFK(target,ePred)
-			end
-		end
-	end
-end
-
-
-
-function LazyVarus:useR()
-	if Game.CanUseSpell(_R) == 0 and self.chargeQ == false and castSpell.state == 0 then
-		local target = self:GetRTarget(500,myHero:GetSpellData(_R).range)
-		if target then
-			if ((self.firstRCast == true or self.chargeR ~= true) or (GetTickCount() - self.lastRtick > 500 + LazyMenu.Combo.R.targetChangeDelay:Value() and GetDistance(target.pos,self.R_target.pos) > 750) or (GetDistance(target.pos,self.R_target.pos) <= 850)) and target ~= self.R_target then
-				self.R_target = target
-			end
-			-- if target == self.R_target or (target ~= self.R_target and GetDistance(target.pos,self.R_target.pos) > 600 and GetTickCount() - self.lastRtick > 800 + LazyMenu.Combo.R.targetChangeDelay:Value()) then
-			if target == self.R_target then
-				if self.chargeR == true and GetTickCount() - self.lastRtick >= 800 + LazyMenu.Combo.R.castDelay:Value() then
-					if target and not IsImmune(target) and (Game.Timer() - OnWaypoint(target).time > 0.05 and (Game.Timer() - OnWaypoint(target).time < 0.20 or Game.Timer() - OnWaypoint(target).time > 1.25) or IsImmobileTarget(target) == true or (self.firstRCast == true and OnVision(target).state == false) ) then
-						local rPred = GetPred(target,math.huge,0.45)
-						if rPred:ToScreen().onScreen then
-							CastSpell(HK_R,rPred,myHero:GetSpellData(_R).range,100)
-							self.R_target = target
-						else
-							CastSpellMM(HK_R,rPred,myHero:GetSpellData(_R).range,100)
-							self.R_target = target
-						end
-					end
-				end
 			end
 		end
 	end
