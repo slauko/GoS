@@ -734,7 +734,7 @@ end
 function LazyVarus:castingQ()
 	if self.chargeQ == true then
 		self.Q.range = 975 + 500*(GetTickCount()-self.qTick)/1000
-		if self.Q.range > 2000 then self.Q.range = 2000 end
+		if self.Q.range > 1900 then self.Q.range = 1900 end
 	end
 	local qBuff = GetBuffData(myHero,"VarusQLaunch")
 	if self.chargeQ == false and qBuff.count > 0 then
@@ -743,7 +743,7 @@ function LazyVarus:castingQ()
 	end
 	if self.chargeQ == true and qBuff.count == 0 then
 		self.chargeQ = false
-		self.Q.range = 750
+		self.Q.range = 925
 		if Control.IsKeyDown(HK_Q) == true then
 			Control.KeyUp(HK_Q)
 		end
@@ -827,13 +827,13 @@ function LazyVarus:EnemyLoop()
 		for i,target in pairs(GetEnemyHeroes()) do
 			if not target.dead and target.isTargetable and target.valid and (OnVision(target).state == true or (OnVision(target).state == false and GetTickCount() - OnVision(target).tick < 500)) then
 				if LazyMenu.Killsteal.useQ:Value() then
-					if Game.CanUseSpell(_Q) == 0 and GetDistance(myHero.pos,target.pos) < 1500 then
+					if Game.CanUseSpell(_Q) == 0 and GetDistance(myHero.pos,target.pos) < 1900 then
 						local hp = target.health + target.shieldAP + target.shieldAD
 						local dmg = CalcPhysicalDamage(myHero,target,40 + 40*myHero:GetSpellData(_Q).level + (0.75*myHero.bonusDamage))
 						if hp < dmg then
 							if self.chargeQ == false then
 								local qPred2 = GetPred(target,math.huge,1.25)
-								if GetDistance(qPred2,myHero.pos) < 1500 then
+								if GetDistance(qPred2,myHero.pos) < 1900 then
 									Control.KeyDown(HK_Q)
 								end
 							else
