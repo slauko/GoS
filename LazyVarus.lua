@@ -1,4 +1,4 @@
--- Lazy Varus
+-- Lazy Varus --- credits to Noddy , just tried to port LazyXerath to Varus :o
 
 if myHero.charName ~= "Varus" then return end
 
