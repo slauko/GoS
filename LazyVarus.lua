@@ -626,11 +626,10 @@ function LazyVarus:__init()
 	self.spellIcons = { Q = "http://vignette4.wikia.nocookie.net/leagueoflegends/images/a/ac/Piercing_Arrow.png",
 						W = "http://vignette2.wikia.nocookie.net/leagueoflegends/images/0/0c/Blighted_Quiver.png",
 						R = "http://vignette2.wikia.nocookie.net/leagueoflegends/images/6/63/Chain_of_Corruption.png"}
-	self.AA = { delay = 0.25, speed = 2000, width = 0, range = 550 }
-	self.Q = { delay = 0.35, speed = math.huge, width = 145, range = 750 }
-	self.W = { delay = 0.5, speed = math.huge, width = 200, range = 1050 }
-	self.E = { delay = 0.25, speed = 2100, width = 80, range = 1050 }
-	self.R = { delay = 0.5, speed = math.huge, width = 200, range = 3520 }
+	self.AA = { delay = 0.25, speed = 2000, width = 0, range = 575 }
+	self.Q = { delay = 0.35, speed = math.huge, width = 145, range = 925 }
+	self.E = { delay = 0.25, speed = 2100, width = 80, range = 925 }
+	self.R = { delay = 0.5, speed = math.huge, width = 200, range = 1075 }
 	self.range = 550
 	self.chargeQ = false
 	self.qTick = GetTickCount()
