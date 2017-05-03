@@ -881,7 +881,7 @@ function LazyVarus:useQonTarget(target,qPred)
 end
 
 function LazyVarus:useQclose(target,qPred)
-	if GetDistance(myHero.pos,qPred) < 900 and Game.Timer() - OnWaypoint(target).time > 0.05 then
+	if GetDistance(myHero.pos,qPred) < 700 and Game.Timer() - OnWaypoint(target).time > 0.05 then
 		ReleaseSpell(HK_Q,qPred,self.Q.range,75)
 		self.lastTarget = target
 		self.lastTarget_tick = GetTickCount() + 200
