@@ -4,7 +4,7 @@ if myHero.charName ~= "Varus" then return end
 
 --MENU
 
-local version = 0.02
+local version = 0.03
 
 local icons = {	["Varus"] = "http://vignette4.wikia.nocookie.net/leagueoflegends/images/c/c2/VarusSquare.png",
 }
@@ -798,8 +798,8 @@ function LazyVarus:useQ()
 	if Game.CanUseSpell(_Q) == 0 and castSpell.state == 0 then
 		local target = GetTarget(2000,"AP")
 		if target then
-			local qPred = GetPred(target,math.huge,0.35 + Game.Latency()/1000)
-			local qPred2 = GetPred(target,math.huge,1)
+			local qPred = GetPred(target,myHero:GetSpellData(_Q).speed,0.35 + Game.Latency()/1000)
+			local qPred2 = GetPred(target,myHero:GetSpellData(_Q).speed,1)
 			if qPred and qPred2 then
 				if GetDistance(myHero.pos,qPred2) <1650 then
 					self:startQ(target)
@@ -840,7 +840,7 @@ function LazyVarus:EnemyLoop()
 						local dmg = CalcPhysicalDamage(myHero,target,40 + 40*myHero:GetSpellData(_Q).level + (0.75*myHero.bonusDamage))
 						if hp < dmg then
 							if self.chargeQ == false then
-								local qPred2 = GetPred(target,math.huge,1.25)
+								local qPred2 = GetPred(target,myHero:GetSpellData(_Q).speed,1.25)
 								if GetDistance(qPred2,myHero.pos) <1650 then
 									Control.KeyDown(HK_Q)
 								end
@@ -930,7 +930,7 @@ end
 
 function LazyVarus:useEbrainAFK(target,ePred)
 	if Game.Timer() - OnWaypoint(target).time > 0.05 and (Game.Timer() - OnWaypoint(target).time < 0.125 or Game.Timer() - OnWaypoint(target).time > 1.25) and GetDistance(myHero.pos,ePred) < self.E.range then
-		if GetDistance(myHero.pos,ePred) <= 500 then
+		if GetDistance(myHero.pos,ePred) <= 715 then
 			CastSpell(HK_E,ePred,5000)
 			self.lastTarget = target
 			self.lastTarget_tick = GetTickCount() + 200
