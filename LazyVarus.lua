@@ -952,7 +952,7 @@ function LazyVarus:useRonKey()
 			local target = GetTarget(500,"AP",mousePos)
 			if not target then target = GetTarget(myHero:GetSpellData(_R).range,"AP") end
 			if target then
-				local rPred = GetPred(target,math.huge,0.45)
+				local rPred = GetPred(target,myHero:GetSpellData(_R).speed,0.45)
 				if rPred:ToScreen().onScreen then
 					CastSpell(HK_R,rPred,myHero:GetSpellData(_R).rage,100)
 					self.R_target = target
