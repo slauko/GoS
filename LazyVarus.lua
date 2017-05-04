@@ -4,7 +4,7 @@ if myHero.charName ~= "Varus" then return end
 
 --MENU
 
-local version = 0.01
+local version = 0.02
 
 local icons = {	["Varus"] = "http://vignette4.wikia.nocookie.net/leagueoflegends/images/c/c2/VarusSquare.png",
 }
@@ -18,6 +18,7 @@ local 	LazyMenu = MenuElement({id = "LazyVarus", name = "Lazy | "..myHero.charNa
 		LazyMenu.Key:MenuElement({id = "Harass", name = "Harass | Mixed", key = string.byte("C")})
 		LazyMenu.Key:MenuElement({id = "Clear", name = "LaneClear | JungleClear", key = string.byte("V")})
 		LazyMenu.Key:MenuElement({id = "LastHit", name = "LastHit", key = string.byte("X")})
+		LazyMenu:MenuElement({id = "Draw", name = "Draw Settings", type = MENU, })
 		LazyMenu:MenuElement({id = "fastOrb", name = "Make Orbwalker fast again", value = true})
 		
 		
@@ -627,8 +628,8 @@ function LazyVarus:__init()
 						W = "http://vignette2.wikia.nocookie.net/leagueoflegends/images/0/0c/Blighted_Quiver.png",
 						R = "http://vignette2.wikia.nocookie.net/leagueoflegends/images/6/63/Chain_of_Corruption.png"}
 	self.AA = { delay = 0.25, speed = 2000, width = 0, range = 575 }
-	self.Q = { delay = 0.35, speed = math.huge, width = 145, range = 925 }
-	self.E = { delay = 0.25, speed = 2100, width = 80, range = 925 }
+	self.Q = { delay = 0.35, speed = math.huge, width = 145, range = 975 }
+	self.E = { delay = 0.25, speed = 2100, width = 80, range = 975 }
 	self.R = { delay = 0.5, speed = math.huge, width = 200, range = 1075 }
 	self.range = 550
 	self.chargeQ = false
@@ -664,6 +665,8 @@ function LazyVarus:Menu()
 
 	LazyMenu.Killsteal:MenuElement({id = "useQ", name = "Use Q to killsteal", value = true, leftIcon = self.spellIcons.Q})
 	LazyMenu.Killsteal:MenuElement({id = "useE", name = "Use E to killsteal", value = true, leftIcon = self.spellIcons.E})
+
+	LazyMenu.Draw:MenuElement({id = "drawQ", name = "Draw Q", value = true, leftIcon = self.spellIcons.Q})
 		
 	LazyMenu:MenuElement({id = "TargetSwitchDelay", name = "Delay between target switch", value = 350, min = 0, max = 750, step = 1})
 	self:TargetMenu()
@@ -709,15 +712,19 @@ if myHero.dead then return end
 	if LazyMenu.Combo.R.useRkey:Value() then
 		Draw.Circle(mousePos,500)
 	end
+	if LazyMenu.Draw.drawQ:Value() then
+		Draw.Circle(myHero.pos, self.Q.range)
+		Draw.Circle(myHero.pos, 1800, Draw.Color(255,255,0,0))
+	end
 end
 
 function LazyVarus:ComboOrb()
 	if self.chargeR == false and castSpell.state == 0 then
-		local target = GetTarget(610)
+		local target = GetTarget(580)
 		local tick = GetTickCount()
 		if target then
-			if aa.state == 1 and self.chargeQ == false and GetDistance(myHero.pos,target.pos) < 575 and (Game.CanUseSpell(_Q) ~= 0 and Game.CanUseSpell(_E) ~= 0) then
-				CastAttack(target,575)
+			if aa.state == 1 and self.chargeQ == false and GetDistance(myHero.pos,target.pos) < 580 and (Game.CanUseSpell(_Q) ~= 0 and Game.CanUseSpell(_E) ~= 0) then
+				CastAttack(target,580)
 			elseif aa.state ~= 2 and tick - lastMove > 120 then
 				Control.Move()
 				lastMove = tick
@@ -733,8 +740,8 @@ end
 
 function LazyVarus:castingQ()
 	if self.chargeQ == true then
-		self.Q.range = 975 + 500*(GetTickCount()-self.qTick)/1000
-		if self.Q.range > 1900 then self.Q.range = 1900 end
+		self.Q.range = 975 + 400*(GetTickCount()-self.qTick)/1000
+		if self.Q.range > 1800 then self.Q.range = 1800 end
 	end
 	local qBuff = GetBuffData(myHero,"VarusQLaunch")
 	if self.chargeQ == false and qBuff.count > 0 then
@@ -743,7 +750,7 @@ function LazyVarus:castingQ()
 	end
 	if self.chargeQ == true and qBuff.count == 0 then
 		self.chargeQ = false
-		self.Q.range = 925
+		self.Q.range = 975
 		if Control.IsKeyDown(HK_Q) == true then
 			Control.KeyUp(HK_Q)
 		end
@@ -758,7 +765,7 @@ function LazyVarus:castingQ()
 	if Control.IsKeyDown(HK_Q) == true and Game.CanUseSpell(_Q) ~= 0 then
 		DelayAction(function()
 			if Control.IsKeyDown(HK_Q) == true then
-				self.Q.range = 925
+				self.Q.range = 975
 				Control.KeyUp(HK_Q)
 			end
 		end,0.01)
@@ -793,7 +800,7 @@ function LazyVarus:useQ()
 			local qPred = GetPred(target,math.huge,0.35 + Game.Latency()/1000)
 			local qPred2 = GetPred(target,math.huge,1)
 			if qPred and qPred2 then
-				if GetDistance(myHero.pos,qPred2) < 2000 then
+				if GetDistance(myHero.pos,qPred2) < 1800 then
 					self:startQ(target)
 				end
 				if self.chargeQ == true then
@@ -827,13 +834,13 @@ function LazyVarus:EnemyLoop()
 		for i,target in pairs(GetEnemyHeroes()) do
 			if not target.dead and target.isTargetable and target.valid and (OnVision(target).state == true or (OnVision(target).state == false and GetTickCount() - OnVision(target).tick < 500)) then
 				if LazyMenu.Killsteal.useQ:Value() then
-					if Game.CanUseSpell(_Q) == 0 and GetDistance(myHero.pos,target.pos) < 1900 then
+					if Game.CanUseSpell(_Q) == 0 and GetDistance(myHero.pos,target.pos) < 1800 then
 						local hp = target.health + target.shieldAP + target.shieldAD
 						local dmg = CalcPhysicalDamage(myHero,target,40 + 40*myHero:GetSpellData(_Q).level + (0.75*myHero.bonusDamage))
 						if hp < dmg then
 							if self.chargeQ == false then
 								local qPred2 = GetPred(target,math.huge,1.25)
-								if GetDistance(qPred2,myHero.pos) < 1900 then
+								if GetDistance(qPred2,myHero.pos) < 1800 then
 									Control.KeyDown(HK_Q)
 								end
 							else
@@ -881,7 +888,7 @@ function LazyVarus:useQonTarget(target,qPred)
 end
 
 function LazyVarus:useQclose(target,qPred)
-	if GetDistance(myHero.pos,qPred) < 700 and Game.Timer() - OnWaypoint(target).time > 0.05 then
+	if GetDistance(myHero.pos,qPred) < 500 and Game.Timer() - OnWaypoint(target).time > 0.05 then
 		ReleaseSpell(HK_Q,qPred,self.Q.range,75)
 		self.lastTarget = target
 		self.lastTarget_tick = GetTickCount() + 200
@@ -922,7 +929,7 @@ end
 
 function LazyVarus:useEbrainAFK(target,ePred)
 	if Game.Timer() - OnWaypoint(target).time > 0.05 and (Game.Timer() - OnWaypoint(target).time < 0.125 or Game.Timer() - OnWaypoint(target).time > 1.25) and GetDistance(myHero.pos,ePred) < self.E.range then
-		if GetDistance(myHero.pos,ePred) <= 800 then
+		if GetDistance(myHero.pos,ePred) <= 500 then
 			CastSpell(HK_E,ePred,5000)
 			self.lastTarget = target
 			self.lastTarget_tick = GetTickCount() + 200
@@ -943,7 +950,7 @@ function LazyVarus:useRonKey()
 		if Game.CanUseSpell(_R) == 0 then
 			local target = GetTarget(500,"AP",mousePos)
 			if not target then target = GetTarget(myHero:GetSpellData(_R).range,"AP") end
-			if target and not IsImmune(target) then
+			if target then
 				local rPred = GetPred(target,math.huge,0.45)
 				if rPred:ToScreen().onScreen then
 					CastSpell(HK_R,rPred,myHero:GetSpellData(_R).rage,100)
