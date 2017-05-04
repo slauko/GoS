@@ -579,7 +579,7 @@ end
 
 local castAttack = {state = 0, tick = GetTickCount(), casting = GetTickCount() - 1000, mouse = mousePos}
 local function CastAttack(pos,range,delay)
-local delay = delay or myHero.attackData.windUpTime*1000/2
+local delay = delay or myHero.attackData.windUpTime*1000
 
 local ticker = GetTickCount()
 	if castAttack.state == 0 and GetDistance(myHero.pos,pos.pos) < range and ticker - castAttack.casting > delay + Game.Latency() and aa.state == 1 and not pos.dead and pos.isTargetable then
@@ -627,7 +627,7 @@ function LazyVarus:__init()
 	self.spellIcons = { Q = "http://vignette4.wikia.nocookie.net/leagueoflegends/images/a/ac/Piercing_Arrow.png",
 						W = "http://vignette2.wikia.nocookie.net/leagueoflegends/images/0/0c/Blighted_Quiver.png",
 						R = "http://vignette2.wikia.nocookie.net/leagueoflegends/images/6/63/Chain_of_Corruption.png"}
-	self.AA = { delay = 0.25, speed = 2000, width = 0, range = 600 }
+	self.AA = { delay = 0.25, speed = 2000, width = 0, range = 675 }
 	self.Q = { delay = 0.35, speed = math.huge, width = 145, range = 975 }
 	self.E = { delay = 0.25, speed = 2100, width = 80, range = 975 }
 	self.R = { delay = 0.5, speed = math.huge, width = 200, range = 1075 }
@@ -715,16 +715,17 @@ if myHero.dead then return end
 	if LazyMenu.Draw.drawQ:Value() then
 		--Draw.Circle(myHero.pos, self.Q.range)
 		Draw.Circle(myHero.pos, 1800, Draw.Color(255,255,0,0))
+		--Draw.Circle(myHero.pos, 675, Draw.Color(255,255,255,0))
 	end
 end
 
 function LazyVarus:ComboOrb()
 	if self.chargeR == false and castSpell.state == 0 then
-		local target = GetTarget(600)
+		local target = GetTarget(675)
 		local tick = GetTickCount()
 		if target then
-			if aa.state == 1 and self.chargeQ == false and GetDistance(myHero.pos,target.pos) < 600 and (Game.CanUseSpell(_Q) ~= 0 and Game.CanUseSpell(_E) ~= 0) then
-				CastAttack(target,600)
+			if aa.state == 1 and self.chargeQ == false and GetDistance(myHero.pos,target.pos) < 675 and (Game.CanUseSpell(_Q) ~= 0 and Game.CanUseSpell(_E) ~= 0) then
+				CastAttack(target,675)
 			elseif aa.state ~= 2 and tick - lastMove > 120 then
 				Control.Move()
 				lastMove = tick
