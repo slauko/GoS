@@ -724,7 +724,7 @@ function LazyVarus:ComboOrb()
 		local target = GetTarget(675)
 		local tick = GetTickCount()
 		if target then
-			if aa.state == 1 and self.chargeQ == false and GetDistance(myHero.pos,target.pos) < 675 and (Game.CanUseSpell(_Q) ~= 0 and Game.CanUseSpell(_E) ~= 0) then
+			if aa.state == 1 and self.chargeQ == false and GetDistance(myHero.pos,target.pos) < 675 then
 				CastAttack(target,675)
 			elseif aa.state ~= 2 and tick - lastMove > 120 then
 				Control.Move()
