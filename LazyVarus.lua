@@ -4,7 +4,7 @@ if myHero.charName ~= "Varus" then return end
 
 --MENU
 
-local version = 0.03
+local version = 0.04
 
 local icons = {	["Varus"] = "http://vignette4.wikia.nocookie.net/leagueoflegends/images/c/c2/VarusSquare.png",
 }
@@ -627,7 +627,7 @@ function LazyVarus:__init()
 	self.spellIcons = { Q = "http://vignette4.wikia.nocookie.net/leagueoflegends/images/a/ac/Piercing_Arrow.png",
 						W = "http://vignette2.wikia.nocookie.net/leagueoflegends/images/0/0c/Blighted_Quiver.png",
 						R = "http://vignette2.wikia.nocookie.net/leagueoflegends/images/6/63/Chain_of_Corruption.png"}
-	self.AA = { delay = 0.25, speed = 2000, width = 0, range = 675 }
+	self.AA = { delay = 0.25, speed = 2000, width = 0, range = 690 }
 	self.Q = { delay = 0.35, speed = math.huge, width = 145, range = 975 }
 	self.E = { delay = 0.25, speed = 2100, width = 80, range = 975 }
 	self.R = { delay = 0.5, speed = math.huge, width = 200, range = 1075 }
@@ -715,17 +715,17 @@ if myHero.dead then return end
 	if LazyMenu.Draw.drawQ:Value() then
 		--Draw.Circle(myHero.pos, self.Q.range)
 		Draw.Circle(myHero.pos,1650, Draw.Color(255,255,0,0))
-		--Draw.Circle(myHero.pos, 675, Draw.Color(255,255,255,0))
+		--Draw.Circle(myHero.pos, 690, Draw.Color(255,255,255,0))
 	end
 end
 
 function LazyVarus:ComboOrb()
 	if self.chargeR == false and castSpell.state == 0 then
-		local target = GetTarget(675)
+		local target = GetTarget(690)
 		local tick = GetTickCount()
 		if target then
-			if aa.state == 1 and self.chargeQ == false and GetDistance(myHero.pos,target.pos) < 675 then
-				CastAttack(target,675)
+			if aa.state == 1 and self.chargeQ == false and GetDistance(myHero.pos,target.pos) < 690 then
+				CastAttack(target,690)
 			elseif aa.state ~= 2 and tick - lastMove > 120 then
 				Control.Move()
 				lastMove = tick
