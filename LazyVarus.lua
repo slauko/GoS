@@ -4,7 +4,7 @@ if myHero.charName ~= "Varus" then return end
 
 --MENU
 
-local version = 0.04
+local version = 0.05
 
 local icons = {	["Varus"] = "http://vignette4.wikia.nocookie.net/leagueoflegends/images/c/c2/VarusSquare.png",
 }
@@ -714,7 +714,7 @@ if myHero.dead then return end
 	end
 	if LazyMenu.Draw.drawQ:Value() then
 		--Draw.Circle(myHero.pos, self.Q.range)
-		Draw.Circle(myHero.pos,1650, Draw.Color(255,255,0,0))
+		Draw.Circle(myHero.pos,1600, Draw.Color(255,255,0,0))
 		--Draw.Circle(myHero.pos, 690, Draw.Color(255,255,255,0))
 	end
 end
@@ -742,7 +742,7 @@ end
 function LazyVarus:castingQ()
 	if self.chargeQ == true then
 		self.Q.range = 975 + 400*(GetTickCount()-self.qTick)/1000
-		if self.Q.range >1650 then self.Q.range =1650 end
+		if self.Q.range >1600 then self.Q.range =1600 end
 	end
 	local qBuff = GetBuffData(myHero,"VarusQLaunch")
 	if self.chargeQ == false and qBuff.count > 0 then
@@ -798,10 +798,10 @@ function LazyVarus:useQ()
 	if Game.CanUseSpell(_Q) == 0 and castSpell.state == 0 then
 		local target = GetTarget(2000,"AP")
 		if target then
-			local qPred = GetPred(target,myHero:GetSpellData(_Q).speed,0.35 + Game.Latency()/1000)
-			local qPred2 = GetPred(target,myHero:GetSpellData(_Q).speed,1)
+			local qPred = GetPred(target,math.huge,0.35 + Game.Latency()/1000)
+			local qPred2 = GetPred(target,math.huge,1)
 			if qPred and qPred2 then
-				if GetDistance(myHero.pos,qPred2) <1650 then
+				if GetDistance(myHero.pos,qPred2) <1600 then
 					self:startQ(target)
 				end
 				if self.chargeQ == true then
@@ -835,13 +835,13 @@ function LazyVarus:EnemyLoop()
 		for i,target in pairs(GetEnemyHeroes()) do
 			if not target.dead and target.isTargetable and target.valid and (OnVision(target).state == true or (OnVision(target).state == false and GetTickCount() - OnVision(target).tick < 500)) then
 				if LazyMenu.Killsteal.useQ:Value() then
-					if Game.CanUseSpell(_Q) == 0 and GetDistance(myHero.pos,target.pos) <1650 then
+					if Game.CanUseSpell(_Q) == 0 and GetDistance(myHero.pos,target.pos) <1600 then
 						local hp = target.health + target.shieldAP + target.shieldAD
 						local dmg = CalcPhysicalDamage(myHero,target,40 + 40*myHero:GetSpellData(_Q).level + (0.75*myHero.bonusDamage))
 						if hp < dmg then
 							if self.chargeQ == false then
-								local qPred2 = GetPred(target,myHero:GetSpellData(_Q).speed,1.25)
-								if GetDistance(qPred2,myHero.pos) <1650 then
+								local qPred2 = GetPred(target,math.huge,1.25)
+								if GetDistance(qPred2,myHero.pos) <1600 then
 									Control.KeyDown(HK_Q)
 								end
 							else
@@ -952,7 +952,7 @@ function LazyVarus:useRonKey()
 			local target = GetTarget(500,"AP",mousePos)
 			if not target then target = GetTarget(myHero:GetSpellData(_R).range,"AP") end
 			if target then
-				local rPred = GetPred(target,myHero:GetSpellData(_R).speed,0.45)
+				local rPred = GetPred(target,math.huge,0.45)
 				if rPred:ToScreen().onScreen then
 					CastSpell(HK_R,rPred,myHero:GetSpellData(_R).rage,100)
 					self.R_target = target
