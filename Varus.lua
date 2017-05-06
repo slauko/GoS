@@ -160,17 +160,18 @@
 		end
 	return end
 	if target~=nil and target.dead then return end
-	local Pred = GetPred(target,math.huge,Game.Latency()/1000)
+	local Pred = GetPred(target,Q.speed,Game.Latency()/1000)
 	   	if IsReady(_Q) and self.Menu.Spell.Q:Value() then
            Control.KeyDown(HK_Q)
         end
-        if GetDistance(myHero.pos,Pred) < Q2.range+100 then 
+        if GetDistance(myHero.pos,Pred) < Q2.range then 
             if not self.Menu.Spell.Q:Value() and qBuff.count > 0 then
                 if not Pred:ToScreen().onScreen then
 				    pos = myHero.pos + Vector(myHero.pos,Pred):Normalized() * math.random(530,760)
-				    Control.CastSpell(HK_Q, pos)
+				   	Control.CastSpell(HK_Q, pos) 
                 else
-                   Control.CastSpell(HK_Q, Pred)
+					pos = myHero.pos + Vector(myHero.pos,Pred):Normalized() * math.random(530,760)
+				   	Control.CastSpell(HK_Q, pos)
                 end
             end
         end
@@ -187,8 +188,8 @@
 		end
 	return end
 	if target~=nil and target.dead then return end
-	local Pred = GetPred(target,math.huge,Game.Latency()/1000)
-	   	if GetDistance(myHero.pos,Pred) < E.range+100 and IsReady(_E) and self.Menu.Spell.E:Value() then
+	local Pred = GetPred(target,E.speed,Game.Latency()/1000)
+	   	if GetDistance(myHero.pos,Pred) < E.range and IsReady(_E) and self.Menu.Spell.E:Value() then
             if not Pred:ToScreen().onScreen then
                 return end
             if Pred:ToScreen().onScreen then
@@ -205,13 +206,14 @@
 		end
 	return end
 	if target~=nil and target.dead then return end
-	local Pred = GetPred(target,math.huge,Game.Latency()/1000)
-		if GetDistance(myHero.pos,Pred) < R.range+100 and IsReady(_R) and self.Menu.Spell.R:Value() then
+	local Pred = GetPred(target,R.speed,Game.Latency()/1000)
+		if GetDistance(myHero.pos,Pred) < R.range and IsReady(_R) and self.Menu.Spell.R:Value() then
             if not Pred:ToScreen().onScreen then
 				pos = myHero.pos + Vector(myHero.pos,Pred):Normalized() * math.random(530,760)
 				Control.CastSpell(HK_R, pos)
             else
-                Control.CastSpell(HK_R, Pred)
+				pos = myHero.pos + Vector(myHero.pos,Pred):Normalized() * math.random(530,760)
+                Control.CastSpell(HK_R, pos)
             end
      	end
 	end
@@ -240,7 +242,7 @@
 function Varus:castingQ()
 	if self.chargeQ == true then
 		Q2.range = 975 + 400*(GetTickCount()-self.qTick)/1000
-		if Q2.range >1600 then Q2.range =1600 end
+		if Q2.range > 1600 then Q2.range = 1600 end
 	end
 	if self.chargeQ == false and qBuff.count > 0 then
 		self.qTick = GetTickCount()
