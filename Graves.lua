@@ -370,9 +370,22 @@ function PassivePercentMod(source, target, amount, damageType)
   return amount
 end
 
-local function IsValidCreep(unit, range)
-    	return unit and unit.team ~= TEAM_ALLY and unit.dead == false and GetDistanceSqr(myHero.pos, unit.pos) <= (range + myHero.boundingRadius + unit.boundingRadius)^2 and unit.isTargetable and unit.isTargetableToTeam and unit.isImmortal == false and unit.visible
-	end
+local isCasting = 0 
+	function AimbotCast(spell, pos, delay) --Weedle with some adds
+	local Cursor = mousePos
+    	if pos == nil or isCasting == 1 then return end
+    		isCasting = 1
+    	    Control.SetCursorPos(pos)
+    	    Control.KeyDown(spell)
+			DelayAction(function()
+			Control.KeyUp(spell)
+    	    Control.SetCursorPos(Cursor)
+    	    DelayAction(function()
+            isCasting = 0
+   		    end, 0.002)
+        	end, (delay + Game.Latency()) / 1000)
+	end 
+
 ----------------------------------------------------------------------------------------------------------	
   class "Graves"
 	
@@ -440,21 +453,21 @@ local function IsValidCreep(unit, range)
 
   function Graves:Combo()
 		Qtarget = EOW:GetTarget(Q.range) 
-		if Qtarget ~= nil and myHero.pos:DistanceTo(Qtarget.pos) < Q.range and self.Menu.Combo.Q:Value() and IsReady(_Q) then
+		if Qtarget ~= nil and myHero.pos:DistanceTo(Qtarget.pos) < Q.range-100 and self.Menu.Combo.Q:Value() and IsReady(_Q) then
 			predPos = GetPred(Qtarget,Q.speed,Q.delay)
-    	Control.CastSpell(HK_Q, predPos)
+    	AimbotCast(HK_Q, predPos, 100)
     end	
 		
 		Wtarget = EOW:GetTarget(W.range)
-    if Wtarget ~= nil and myHero.pos:DistanceTo(Wtarget.pos) < W.range and self.Menu.Combo.W:Value() and IsReady(_W) then
+    if Wtarget ~= nil and myHero.pos:DistanceTo(Wtarget.pos) < W.range-100 and self.Menu.Combo.W:Value() and IsReady(_W) then
 			predPos = GetPred(Wtarget,W.speed,W.delay)
-			Control.CastSpell(HK_W, predPos)
+			AimbotCast(HK_W, predPos, 100)
 		end	
 		
 		Etarget = EOW:GetTarget(myHero.range)
 		if Etarget ~=nil and myHero.pos:DistanceTo(Etarget.pos) < E.range and self.Menu.Combo.E:Value() and IsReady(_E) then
 			if EOW:CanAttack() == false	then	--AA reset
-				Control.CastSpell(HK_E, mousePos)
+				AimbotCast(HK_E, mousePos, 100)
 			end
 		end	
 		
@@ -462,7 +475,7 @@ local function IsValidCreep(unit, range)
 		if Rtarget ~= nil and myHero.pos:DistanceTo(Rtarget.pos) < R.range and self.Menu.Combo.R:Value() and IsReady(_R) then 
       if Rtarget.health-CalcPhysicalDamage(myHero, Rtarget, ultdmg) < 0 then
 			  predPos = GetPred(Rtarget,R.speed,R.delay)
-			  Control.CastSpell(HK_R, predPos)
+			  AimbotCast(HK_R, predPos, 100)
       end
 		end 
 	end
@@ -471,13 +484,13 @@ local function IsValidCreep(unit, range)
 		Qtarget = EOW:GetTarget(Q.range)
 		if Qtarget ~=nil and myHero.pos:DistanceTo(Qtarget.pos) < Q.range and self.Menu.Combo.Q:Value() and IsReady(_Q) then
 			predPos = GetPred(Qtarget,Q.speed,Q.delay)
-			Control.CastSpell(HK_Q, predPos)
+			AimbotCast(HK_Q, predPos, 100)
 		end	
 		
 		Wtarget = EOW:GetTarget(W.range)
 		if Wtarget ~= nil and myHero.pos:DistanceTo(Wtarget.pos) < W.range and self.Menu.Combo.W:Value() and IsReady(_W)then
 			predPos = GetPred(Wtarget,W.speed,W.delay)
-			Control.CastSpell(HK_W, predPos)
+			AimbotCast(HK_W, predPos, 100)
 		end
 			
 	end
@@ -485,16 +498,15 @@ local function IsValidCreep(unit, range)
 	function Graves:Laneclear()
 		for i = 1, Game.MinionCount() do
 			local Minion = Game.Minion(i)
-      if Minion.team == 300 then
+      if Minion.team ~= 100 and not Minion.dead then
 			  if myHero.pos:DistanceTo(Minion.pos) < Q.range and self.Menu.Laneclear.Q:Value() and IsReady(_Q) then
-				  Control.CastSpell(HK_Q,Minion.pos)
+          AimbotCast(HK_Q,Minion.pos, 100)
         end
 			end
-      DelayAction(function()
 			  if EOW:CanAttack() == false and self.Menu.Laneclear.E:Value() and IsReady(_E) then		--AA reset
-			  	Control.CastSpell(HK_E, mousePos)
+			  	AimbotCast(HK_E, mousePos, 100)
 			  end	
-      end,0.05)
+      
 		end
 	end
 
