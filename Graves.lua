@@ -1,5 +1,5 @@
 if myHero.charName ~="Graves" then return end
-	
+
 function IsReady(slot)
 	if Game.CanUseSpell(slot) == 0 then
 		return true
@@ -358,7 +358,7 @@ function PassivePercentMod(source, target, amount, damageType)
       amount = amount * 0.7
     elseif table.contains(NormalMinionList, target.charName) then
       amount = amount * 1.14285714285714
-    end
+    end 
   end
   if source.type == Obj_AI_Hero then 
     if target.type == Obj_AI_Hero then
@@ -369,21 +369,24 @@ function PassivePercentMod(source, target, amount, damageType)
   end
   return amount
 end
-
+---------------------------------------------------------------------------------------------------------
 local isCasting = 0 
-	function AimbotCast(spell, pos, delay) --Weedle with some adds
+	function AimbotCast(spell, pos, delay)
 	local Cursor = mousePos
     	if pos == nil or isCasting == 1 then return end
     		isCasting = 1
-    	    Control.SetCursorPos(pos)
-    	    Control.KeyDown(spell)
-			DelayAction(function()
-			Control.KeyUp(spell)
+        if not pos:ToScreen().onScreen then
+				  pos = myHero.pos + Vector(myHero.pos,pos):Normalized() * math.random(530,760)
+        end
+    	  Control.SetCursorPos(pos)
+    	  Control.KeyDown(spell)
+			  DelayAction(function()
+			    Control.KeyUp(spell)
     	    Control.SetCursorPos(Cursor)
-    	    DelayAction(function()
-            isCasting = 0
-   		    end, 0.002)
-        	end, (delay + Game.Latency()) / 1000)
+    	      DelayAction(function()
+              isCasting = 0
+   		      end, 0.002)
+        end, (delay + Game.Latency()) / 1000)
 	end 
 
 ----------------------------------------------------------------------------------------------------------	
@@ -455,7 +458,9 @@ local isCasting = 0
 		Qtarget = EOW:GetTarget(Q.range) 
 		if Qtarget ~= nil and myHero.pos:DistanceTo(Qtarget.pos) < Q.range-100 and self.Menu.Combo.Q:Value() and IsReady(_Q) then
 			predPos = GetPred(Qtarget,Q.speed,Q.delay)
-    	AimbotCast(HK_Q, predPos, 100)
+      if MapPosition:intersectsWall(LineSegment(Point(myHero.pos), Point(predPos))) == false then
+    	  AimbotCast(HK_Q, predPos, 100)
+      end
     end	
 		
 		Wtarget = EOW:GetTarget(W.range)
@@ -484,7 +489,9 @@ local isCasting = 0
 		Qtarget = EOW:GetTarget(Q.range)
 		if Qtarget ~=nil and myHero.pos:DistanceTo(Qtarget.pos) < Q.range and self.Menu.Combo.Q:Value() and IsReady(_Q) then
 			predPos = GetPred(Qtarget,Q.speed,Q.delay)
-			AimbotCast(HK_Q, predPos, 100)
+      if MapPosition:intersectsWall(LineSegment(Point(myHero.pos), Point(predPos))) == false then
+			  AimbotCast(HK_Q, predPos, 100)
+      end
 		end	
 		
 		Wtarget = EOW:GetTarget(W.range)
@@ -498,15 +505,14 @@ local isCasting = 0
 	function Graves:Laneclear()
 		for i = 1, Game.MinionCount() do
 			local Minion = Game.Minion(i)
-      if Minion.team ~= 100 and not Minion.dead then
-			  if myHero.pos:DistanceTo(Minion.pos) < Q.range and self.Menu.Laneclear.Q:Value() and IsReady(_Q) then
+      if Minion and Minion.team ~= 100 and not Minion.dead then
+			  if myHero.pos:DistanceTo(Minion.pos) < Q.range and MapPosition:intersectsWall(LineSegment(Point(myHero.pos), Point(Minion.pos))) == false and self.Menu.Laneclear.Q:Value() and IsReady(_Q) then
           AimbotCast(HK_Q,Minion.pos, 100)
         end
-			end
-			  if EOW:CanAttack() == false and self.Menu.Laneclear.E:Value() and IsReady(_E) then		--AA reset
+        if EOW:CanAttack() == false and self.Menu.Laneclear.E:Value() and IsReady(_E) then		--AA reset
 			  	AimbotCast(HK_E, mousePos, 100)
-			  end	
-      
+			  end
+			end       	
 		end
 	end
 
